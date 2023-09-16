@@ -1,118 +1,118 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import LandingScreen from './src/screens/LandingScreen';
+import SplashScreen from './src/screens/SplashScreen';
+import {createSwitchNavigator} from 'react-navigation';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import HomeScreen from './src/screens/HomeScreen';
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import OfferScreen from './src/screens/OfferScreen';
+import CartScreen from './src/screens/CartScreen';
+import AccountScreen from './src/screens/AccountScreen';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Screen} from 'react-native-screens';
+import Colors from './src/utils/Colors';
+import {Provider} from 'react-redux';
+import store from './src/redux/store';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const stack = createNativeStackNavigator();
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const bottom = createBottomTabNavigator();
+const AppBottomStack = () => {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <bottom.Navigator
+      initialRouteName="Home"
+      screenOptions={({route}) => ({
+        headerShown: false,
+        tabBarStyle: {
+          marginVertical: 20,
+          marginHorizontal: 8,
+          height: 60,
+          borderRadius: 16,
+          backgroundColor: Colors.darkPurple,
+        },
+        tabBarShowLabel: false,
+        tabBarIcon: ({focused, size}) => {
+          let iconName;
+          let routeName = route.name;
+          let iconColor = focused ? Colors.white : Colors.white;
+          let icon;
+          if (routeName == 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (routeName == 'Offer') {
+            iconName = focused ? 'at-circle-sharp' : 'at-outline';
+          } else if (routeName == 'Cart') {
+            iconName = focused ? 'cart-sharp' : 'cart-outline';
+          } else {
+            iconName = focused
+              ? 'person-circle-sharp'
+              : 'person-circle-outline';
+          }
+          return (icon = (
+            <IonIcon name={iconName} size={size} color={iconColor} />
+          ));
+        },
+      })}>
+      <bottom.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          tabBarLabel: 'Home',
+          tabBarActiveTintColor: Colors.darkPurple,
+        }}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <bottom.Screen
+        name="Offer"
+        component={OfferScreen}
+        options={{
+          tabBarLabel: 'Offer',
+          tabBarActiveTintColor: Colors.darkPurple,
+        }}
+      />
+      <bottom.Screen
+        name="Cart"
+        component={CartScreen}
+        options={{
+          tabBarLabel: 'Cart',
+          tabBarActiveTintColor: Colors.darkPurple,
+        }}
+      />
+      <bottom.Screen
+        name="Account"
+        component={AccountScreen}
+        options={{
+          tabBarLabel: 'Account',
+          tabBarActiveTintColor: Colors.darkPurple,
+        }}
+      />
+    </bottom.Navigator>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+const AppContainer = () => {
+  return (
+    <NavigationContainer>
+      <stack.Navigator
+        screenOptions={{headerShown: false}}
+        initialRouteName="splash">
+        <stack.Screen name="bottom" component={AppBottomStack} />
+        <stack.Screen name="landing" component={LandingScreen} />
+        <stack.Screen name="splash" component={SplashScreen} />
+      </stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+const App = () => {
+  return <Provider store={store}>{AppContainer()}</Provider>;
+};
 
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
